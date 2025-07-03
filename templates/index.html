@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Watchlist{% endblock %}
+
+{% block head %}
+<style>
+  .movie-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .movie-table th, .movie-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+
+  .movie-table th {
+    background-color: #f0f0f0;
+  }
+
+  .delete-btn {
+    color: crimson;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .delete-btn:hover {
+    text-decoration: underline;
+  }
+</style>
+<style>
+  .plot-toggle-btn {
+    padding: 6px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background-color: #e3e3e3;
+    border-radius: 4px;
+  }
+
+  .plot-toggle-btn:hover {
+    background-color: #d2d2d2;
+  }
+</style>
+
+{% endblock %}
+
+{% block body %}
+<h2 style="text-align: center;">🎬 Your Movie Watchlist</h2>
+
+<table class="movie-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Director</th>
+      <th>Year</th>
+      <th>Genre</th>
+      <th>IMDb Rating</th>
+      <th>Plot</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for movie in movies %}
+    <tr>
+      <td>{{ movie.id }}</td>
+      <td>{{ movie.title }}</td>
+      <td>{{ movie.director }}</td>
+      <td>{{ movie.year }}</td>
+      <td>{{ movie.genre }}</td>
+      <td>{{ movie.rating }}</td>
+      
+      <td>
+        <button 
+        class="plot-toggle-btn" 
+        data-plot="{{ movie.plot | escape }}" 
+        onclick="showPlot(this)">
+        View Plot
+        </button>
+      </td>
+      
+      <td>
+        <a href="/delete/{{ movie.id }}" class="delete-btn">Delete</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="7">No movies added yet. 🎞️ Add your first title!</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<!-- Add Movie Form -->
+<form action="{{ url_for('add_movie') }}" method="POST" style="margin-bottom: 20px; margin-top: 30px; text-align: center;">
+  <label for="title">Movie Title:</label>
+  <input type="text" id="title" name="title" required>
+  <button type="submit">Add Movie</button>
+</form>
+<!-- 📘 This displays the plot when a movie button is clicked -->
+<div id="plot-display" style="display: none; margin: 40px auto 20px; padding: 20px; max-width: 700px; background-color: #f9f9f9; border-left: 4px solid #007BFF; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+  <h3 style="margin-top: 0;">📝 Plot Summary</h3>
+  <p id="plot-content" style="font-size: 16px; color: #333;"></p>
+</div>
+<script>
+  function showPlot(button) {
+    const box = document.getElementById("plot-display");
+    const content = document.getElementById("plot-content");
+    const plotText = button.getAttribute("data-plot");
+
+    if (box.style.display === "none" || content.innerText !== plotText) {
+      content.innerText = plotText;
+      box.style.display = "block";
+    } else {
+      box.style.display = "none";
+      content.innerText = "";
+    }
+  }
+</script>
+{% endblock %}
